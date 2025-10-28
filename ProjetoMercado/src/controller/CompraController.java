@@ -3,30 +3,42 @@ package controller;
 import model.Compras;
 import model.ComprasDAO;
 import model.ItemCompra;
+import model.CarrinhoDAO;
 import view.TelaCompras;
 
 import javax.swing.*;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.Locale;
-import java.awt.event.ActionEvent;
 
 public class CompraController {
 
     private final TelaCompras view;
     private final ComprasDAO compraDAO;
+    private final CarrinhoDAO carrinhoDAO;
+    private final Navegador navegador;
+    private final CadastroProdutosController cadastroProdutosController; 
     private String usuarioLogado;
 
-    
-    public CompraController(TelaCompras view, String usuarioLogado) {
+    public CompraController(
+            TelaCompras view,
+            String usuarioLogado,
+            Navegador navegador,
+            CadastroProdutosController cadastroProdutosController 
+    ) {
         this.view = view;
-        this.usuarioLogado = usuarioLogado;
+        this.usuarioLogado = (usuarioLogado == null ? null : usuarioLogado.trim());
         this.compraDAO = new ComprasDAO();
+        this.carrinhoDAO = new CarrinhoDAO();
+        this.navegador = navegador;
+        this.cadastroProdutosController = cadastroProdutosController;
         wire();
     }
 
     private void wire() {
-        view.finalizar(e -> finalizarCompra()); 
+        view.finalizar(e -> finalizarCompra());
+        view.sair(e -> navegador.navegarPara("LOGIN"));
     }
 
     private void finalizarCompra() {
@@ -38,7 +50,6 @@ public class CompraController {
                 return;
             }
 
-          
             NumberFormat moeda = NumberFormat.getCurrencyInstance(new Locale("pt", "BR"));
             SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
 
@@ -63,6 +74,14 @@ public class CompraController {
 
             JOptionPane.showMessageDialog(view, sb.toString(),
                     "Compra Finalizada", JOptionPane.INFORMATION_MESSAGE);
+         
+            try { carrinhoDAO.removerTodosProdutos(usuarioLogado); } catch (Exception ignore) {}
+            view.setCarrinho(Collections.emptyList());
+            view.setTotalTexto(moeda.format(0));
+
+            if (cadastroProdutosController != null) {
+                cadastroProdutosController.atualizarListaExterna(); 
+            }
 
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -71,8 +90,7 @@ public class CompraController {
         }
     }
 
-	public void setUsuario(String usu) {
-		// TODO Auto-generated method stub
-		this.usuarioLogado = (usu == null ? null : usu.trim());
-	}
+    public void setUsuario(String usu) {
+        this.usuarioLogado = (usu == null ? null : usu.trim());
+    }
 }

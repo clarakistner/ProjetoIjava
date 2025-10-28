@@ -8,11 +8,11 @@ import java.util.List;
 public class CarrinhoDAO {
 
 	private static final String URL =
-		    "jdbc:mysql://localhost:3306/loja?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";
-		private static final String USER = "root";       
-		private static final String PASS = "NovaSenha!2025";  
-
-		private static final String SQL_ADD_UPSERT =
+		    "jdbc:mysql://localhost:3306/loja?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=America/Sao_Paulo";
+    private static final String USER = "root";
+    private static final String PASS = "NovaSenha!2025";
+  
+    private static final String SQL_ADD_UPSERT =
         "INSERT INTO carrinho (id_usuario, id_produto, quantidade) VALUES (?, ?, ?) " +
         "ON DUPLICATE KEY UPDATE quantidade = quantidade + VALUES(quantidade)";
 
@@ -42,20 +42,61 @@ public class CarrinhoDAO {
         "  JOIN produtos p ON p.id = c.id_produto " +
         " WHERE c.id_usuario = ?";
 
+    private static final String SQL_ESTOQUE_PROD =
+        "SELECT quantidade FROM produtos WHERE id = ? FOR UPDATE";
+
+    private static final String SQL_GET_QTD_CARRINHO =
+        "SELECT quantidade FROM carrinho WHERE id_usuario = ? AND id_produto = ?";
+
     public boolean adicionarProduto(String idUsuario, int idProduto, int quantidade) throws SQLException {
         if (idUsuario == null || idUsuario.isBlank()) throw new IllegalArgumentException("Usuário inválido");
         if (quantidade <= 0) throw new IllegalArgumentException("Quantidade deve ser > 0");
 
-        try (Connection con = getConnection();
-             PreparedStatement ps = con.prepareStatement(SQL_ADD_UPSERT)) {
-            ps.setString(1, idUsuario.trim());
-            ps.setInt(2, idProduto);
-            ps.setInt(3, quantidade);
-            return ps.executeUpdate() > 0;
+        try (Connection con = getConnection()) {
+            con.setAutoCommit(false);
+            try {
+                int estoque;
+                try (PreparedStatement ps = con.prepareStatement(SQL_ESTOQUE_PROD)) {
+                    ps.setInt(1, idProduto);
+                    try (ResultSet rs = ps.executeQuery()) {
+                        if (!rs.next()) { con.rollback(); return false; }
+                        estoque = rs.getInt(1);
+                    }
+                }
+
+                int noCarrinho = 0;
+                try (PreparedStatement ps = con.prepareStatement(SQL_GET_QTD_CARRINHO)) {
+                    ps.setString(1, idUsuario.trim());
+                    ps.setInt(2, idProduto);
+                    try (ResultSet rs = ps.executeQuery()) {
+                        if (rs.next()) noCarrinho = rs.getInt(1);
+                    }
+                }
+
+                if (noCarrinho + quantidade > estoque) {
+                    con.rollback();
+                    return false; // estoque insuficiente
+                }
+                
+                try (PreparedStatement ps = con.prepareStatement(SQL_ADD_UPSERT)) {
+                    ps.setString(1, idUsuario.trim());
+                    ps.setInt(2, idProduto);
+                    ps.setInt(3, quantidade);
+                    ps.executeUpdate();
+                }
+
+                con.commit();
+                return true;
+            } catch (SQLException e) {
+                con.rollback();
+                throw e;
+            } finally {
+                con.setAutoCommit(true);
+            }
         }
     }
 
-     public boolean removerProduto(String idUsuario, int idProduto, int quantidade) throws SQLException {
+    public boolean removerProduto(String idUsuario, int idProduto, int quantidade) throws SQLException {
         if (idUsuario == null || idUsuario.isBlank()) return false;
         if (quantidade <= 0) return false;
 
@@ -143,6 +184,18 @@ public class CarrinhoDAO {
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) return rs.getBigDecimal("total");
                 return BigDecimal.ZERO;
+            }
+        }
+    }
+    
+    public int getQuantidadeNoCarrinho(String idUsuario, int idProduto) throws SQLException {
+        if (idUsuario == null || idUsuario.isBlank()) return 0;
+        try (Connection con = getConnection();
+             PreparedStatement ps = con.prepareStatement(SQL_GET_QTD_CARRINHO)) {
+            ps.setString(1, idUsuario.trim());
+            ps.setInt(2, idProduto);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next() ? rs.getInt(1) : 0;
             }
         }
     }

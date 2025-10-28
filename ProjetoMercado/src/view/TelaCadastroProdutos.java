@@ -18,19 +18,19 @@ public class TelaCadastroProdutos extends JPanel {
     private final JTextField txtQuantidade = new JTextField();
 
     private final JButton btnCadastrar = new JButton("Cadastrar");
-    private final JButton btnEditar    = new JButton("Editar");
-    private final JButton btnExcluir   = new JButton("Excluir");
-    private final JButton btnExibir    = new JButton("Exibir");
+    private final JButton btnEditar = new JButton("Editar");
+    private final JButton btnExcluir = new JButton("Excluir");
+    private final JButton btnExibir = new JButton("Exibir");
 
     private final JTable tabela;
     private final DefaultTableModel modelo;
     private List<Produto> data = new ArrayList<>();
+    private final JButton btnSair = new JButton("Sair");
 
     public TelaCadastroProdutos() {
         setBackground(new Color(255, 182, 193));
         setLayout(null);
         setPreferredSize(new Dimension(700, 500));
-
 
         JLabel lblTitulo = new JLabel("Cadastro de Produtos");
         lblTitulo.setFont(new Font("Baskerville Old Face", Font.BOLD | Font.ITALIC, 24));
@@ -52,7 +52,7 @@ public class TelaCadastroProdutos extends JPanel {
         add(txtNome);
 
         JLabel lblQtd = new JLabel("Quantidade:");
-        lblQtd.setBounds(390, 107, 60, 20);
+        lblQtd.setBounds(390, 107, 75, 20);
         add(lblQtd);
 
         txtQuantidade.setBounds(475, 105, 125, 24);
@@ -69,8 +69,11 @@ public class TelaCadastroProdutos extends JPanel {
         add(btnCadastrar);
 
         modelo = new DefaultTableModel(new Object[]{"ID", "Nome", "Quantidade", "Preço"}, 0) {
-            @Override public boolean isCellEditable(int r, int c) { return false; }
+            @Override public boolean isCellEditable(int r, int c) {
+            	return false; 
+            	}
         };
+        
         tabela = new JTable(modelo);
         tabela.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
@@ -84,27 +87,71 @@ public class TelaCadastroProdutos extends JPanel {
         add(btnExibir);
         add(btnExcluir);
         add(btnEditar);
+
+        btnSair.setBounds(601, 460, 89, 23);
+        add(btnSair);
     }
 
-    public void onCadastrar(ActionListener l) { btnCadastrar.addActionListener(l); }
-    public void onAtualizar(ActionListener l) { btnEditar.addActionListener(l); }
-    public void onExcluir(ActionListener l)   { btnExcluir.addActionListener(l); }
-    public void onListar(ActionListener l)    { btnExibir.addActionListener(l); }
+    public void onCadastrar(ActionListener l) { 
+    	btnCadastrar.addActionListener(l); 
+    }
+    
+    public void onAtualizar(ActionListener l) { 
+    	btnEditar.addActionListener(l); 
+    }
+    
+    public void onExcluir(ActionListener l) { 
+    	btnExcluir.addActionListener(l); 
+    }
+    public void onListar(ActionListener l) {
+    	btnExibir.addActionListener(l); 
+    }
 
-    public String getIdText() { return ""; }
+    public void sair(ActionListener l) { 
+    	btnSair.addActionListener(l); 
+    }
+
+    public String getIdText() {
+    	return ""; 
+    }
+    
     public void setIdText(String s) {  }
 
-    public String getNomeText()       { return txtNome.getText().trim(); }
-    public String getDescricaoText()  { return txtDescricao.getText().trim(); }
-    public String getPrecoText()      { return txtPreco.getText().trim(); }
-    public String getQuantidadeText() { return txtQuantidade.getText().trim(); }
+    public String getNomeText() { 
+    	return txtNome.getText().trim(); 
+    }
+    
+    public String getDescricaoText() { 
+    	return txtDescricao.getText().trim(); 
+    }
+    
+    public String getPrecoText() { 
+    	return txtPreco.getText().trim(); 
+    }
+    
+    public String getQuantidadeText() { 
+    	return txtQuantidade.getText().trim(); 
+    }
 
-    public void setNomeText(String s)       { txtNome.setText(s == null ? "" : s); }
-    public void setDescricaoText(String s)  { txtDescricao.setText(s == null ? "" : s); }
-    public void setPrecoText(String s)      { txtPreco.setText(s == null ? "" : s); }
-    public void setQuantidadeText(String s) { txtQuantidade.setText(s == null ? "" : s); }
+    public void setNomeText(String s) { 
+    	txtNome.setText(s == null ? "" : s); 
+    }
+    
+    public void setDescricaoText(String s) { 
+    	txtDescricao.setText(s == null ? "" : s); 
+    }
+    
+    public void setPrecoText(String s) { 
+    	txtPreco.setText(s == null ? "" : s); 
+    }
+    
+    public void setQuantidadeText(String s) { 
+    	txtQuantidade.setText(s == null ? "" : s);
+    }
 
-    public void requestFocusNome() { txtNome.requestFocusInWindow(); }
+    public void requestFocusNome() { 
+    	txtNome.requestFocusInWindow(); 
+    }
 
     public void setProdutos(List<Produto> produtos) {
         data = (produtos == null) ? new ArrayList<>() : new ArrayList<>(produtos);
@@ -131,5 +178,7 @@ public class TelaCadastroProdutos extends JPanel {
         return (p == null ? null : p.getId());
     }
 
-    public Component getComponent() { return this; }
+    public Component getComponent() { 
+    	return this; 
+    }
 }

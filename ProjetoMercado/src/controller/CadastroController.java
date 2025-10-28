@@ -7,6 +7,7 @@ import view.TelaLogin;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
+import util.CpfUtils;
 
 public class CadastroController {
 
@@ -25,10 +26,10 @@ public class CadastroController {
             CarrinhoController carrinhoController,
             CompraController compraController
     ) {
-        this.telaLogin   = telaLogin;
-        this.telaCadastro= telaCadastro;
-        this.usuarioDAO  = usuarioDAO;
-        this.navegador   = navegador;
+        this.telaLogin = telaLogin; 
+        this.telaCadastro = telaCadastro;
+        this.usuarioDAO = usuarioDAO;
+        this.navegador = navegador;
         this.carrinhoController = carrinhoController;
         this.compraController   = compraController; 
         wireLogin();
@@ -47,10 +48,10 @@ public class CadastroController {
 
     private void fazerLogin() {
         String usuario = telaLogin.getUsuario();
-        String senha   = telaLogin.getSenha();
+        String cpf = util.CpfUtils.unmask(telaLogin.getCPF());
 
         try {
-            Usuario u = usuarioDAO.logar(usuario, senha);
+            Usuario u = usuarioDAO.logar(usuario, cpf);
             if (u == null) {
                 JOptionPane.showMessageDialog(telaLogin, "Usuário ou senha inválidos.");
                 return;
@@ -59,32 +60,39 @@ public class CadastroController {
             String usu = u.getUsuario();
 
             if (carrinhoController != null) carrinhoController.setUsuario(usu);
-            if (compraController   != null) compraController.setUsuario(usu);
+            if (compraController != null) compraController.setUsuario(usu);
 
             if (u.isAdmin()) {
                 navegador.navegarPara("CADASTRO_PRODUTOS");
+                telaLogin.limparCampos();
             } else {
                 navegador.navegarPara("COMPRAS");
+                telaLogin.limparCampos();
             }
         } catch (Exception ex) {
             ex.printStackTrace();
             JOptionPane.showMessageDialog(telaLogin, "Erro ao logar: " + ex.getMessage());
         }
     }
+    
 
     private void cadastrarUsuario() {
         String usuario = telaCadastro.getUsuario();
-        String senha   = telaCadastro.getSenha();
-        boolean admin  = telaCadastro.isAdminSelecionado();
+        String cpf = telaCadastro.getCpfDigits(); // só 11 dígitos
+        if (!CpfUtils.has11(cpf)) {
+            JOptionPane.showMessageDialog(telaCadastro, "CPF deve ter 11 dígitos.");
+            return;
+        }
+        boolean admin = telaCadastro.isAdminSelecionado();
 
         if (usuario == null || usuario.isBlank()) {
             JOptionPane.showMessageDialog(telaCadastro, "Informe o usuário.");
             return;
         }
-        if (senha == null) senha = "";
+        if (cpf == null) cpf = "";
 
         try {
-            boolean ok = usuarioDAO.cadastrarUsuario(usuario, senha, admin);
+            boolean ok = usuarioDAO.cadastrarUsuario(usuario, cpf, admin);
             if (ok) {
                 JOptionPane.showMessageDialog(telaCadastro, "Usuário cadastrado com sucesso!");
                 telaCadastro.limparCampos();

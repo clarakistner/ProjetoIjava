@@ -2,12 +2,12 @@ package model;
 
 public class Usuario {
     private String usuario; 
-    private String senha;   
+    private String cpf;   
     private boolean admin;
 
-    public Usuario(String usuario, String senha, boolean admin) {
+    public Usuario(String usuario, String cpf, boolean admin) {
         this.usuario = usuario;
-        this.senha = senha;
+        this.cpf = cpf;
         this.admin = admin;
     }
 
@@ -19,12 +19,12 @@ public class Usuario {
     	this.usuario = usuario; 
     }
 
-    public String getSenha() { 
-    	return senha; 
+    public String getCPF() { 
+    	return cpf; 
     }
     
-    public void setSenha(String senha) { 
-    	this.senha = senha; 
+    public void setCPF(String cpf) { 
+    	this.cpf = cpf; 
     }
 
     public boolean isAdmin() { 

@@ -21,7 +21,6 @@ public class Compras {
         this.dataCompra = dataCompra;
     }
 
-    // Getters/Setters
     public Integer getId() { 
     	return id; 
     }

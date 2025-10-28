@@ -9,7 +9,7 @@ public class TelaLogin extends JPanel {
     private static final long serialVersionUID = 1L;
 
     private JTextField textFieldUsuario;
-    private JPasswordField textFieldSenha;
+    private JPasswordField textFieldCPF;
 
     private JButton btnEntrar;
     private JButton btnCadastro;
@@ -30,18 +30,18 @@ public class TelaLogin extends JPanel {
         lblUsuario.setBounds(114, 163, 83, 31);
         add(lblUsuario);
 
-        JLabel lblSenha = new JLabel("Senha:");
-        lblSenha.setFont(new Font("Baskerville Old Face", Font.BOLD, 20));
-        lblSenha.setBounds(117, 223, 66, 20);
-        add(lblSenha);
+        JLabel lblCPF = new JLabel("CPF:");
+        lblCPF.setFont(new Font("Baskerville Old Face", Font.BOLD, 20));
+        lblCPF.setBounds(117, 223, 66, 20);
+        add(lblCPF);
 
         textFieldUsuario = new JTextField();
         textFieldUsuario.setBounds(220, 169, 249, 20);
         add(textFieldUsuario);
 
-        textFieldSenha = new JPasswordField();
-        textFieldSenha.setBounds(220, 224, 249, 20);
-        add(textFieldSenha);
+        textFieldCPF = new JPasswordField();
+        textFieldCPF.setBounds(220, 224, 249, 20);
+        add(textFieldCPF);
 
         btnCadastro = new JButton("Cadastro");
         btnCadastro.setBounds(549, 427, 100, 23);
@@ -56,8 +56,8 @@ public class TelaLogin extends JPanel {
         return textFieldUsuario.getText();
     }
 
-    public String getSenha() {
-        return new String(textFieldSenha.getPassword());
+    public String getCPF() {
+        return new String(textFieldCPF.getPassword());
     } 
 
     public void entrar(ActionListener al) {
@@ -69,7 +69,7 @@ public class TelaLogin extends JPanel {
     }
 
     public void limparCampos() {
-        textFieldSenha.setText("");
+        textFieldCPF.setText("");
         textFieldUsuario.setText("");
     }
 

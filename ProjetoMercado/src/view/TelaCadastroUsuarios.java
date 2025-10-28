@@ -2,12 +2,13 @@ package view;
 
 import javax.swing.*;
 import java.awt.*;
+import util.CpfUtils;
 
 public class TelaCadastroUsuarios extends JPanel {
     private static final long serialVersionUID = 1L;
 
     private JTextField textFieldUsuario;
-    private JTextField textFieldSenha;   
+    private JFormattedTextField textFieldCPF;   
     private JCheckBox chckbxAdm;
     private JButton btnCadastrar;
 
@@ -15,7 +16,6 @@ public class TelaCadastroUsuarios extends JPanel {
         setBackground(new Color(255, 182, 193));
         setLayout(null);
         setPreferredSize(new Dimension(700, 500));
-
 
         JLabel lblCadastro = new JLabel("Cadastro");
         lblCadastro.setFont(new Font("Baskerville Old Face", Font.BOLD | Font.ITALIC, 30));
@@ -26,9 +26,9 @@ public class TelaCadastroUsuarios extends JPanel {
         textFieldUsuario.setBounds(175, 152, 358, 25);
         add(textFieldUsuario);
 
-        textFieldSenha = new JTextField();                 
-        textFieldSenha.setBounds(175, 200, 358, 25);
-        add(textFieldSenha);
+        textFieldCPF = new JFormattedTextField(CpfUtils.cpfMask());                 
+        textFieldCPF.setBounds(175, 200, 358, 25);
+        add(textFieldCPF);
 
         chckbxAdm = new JCheckBox("Administrador?");       
         chckbxAdm.setBounds(76, 253, 174, 29);
@@ -39,10 +39,10 @@ public class TelaCadastroUsuarios extends JPanel {
         lblUsuario.setBounds(76, 152, 104, 29);
         add(lblUsuario);
 
-        JLabel lblSenha = new JLabel("Senha:");
-        lblSenha.setFont(new Font("Baskerville Old Face", Font.BOLD, 20));
-        lblSenha.setBounds(75, 206, 70, 17);
-        add(lblSenha);
+        JLabel lblCPF = new JLabel("CPF:");
+        lblCPF.setFont(new Font("Baskerville Old Face", Font.BOLD, 20));
+        lblCPF.setBounds(75, 206, 70, 17);
+        add(lblCPF);
 
         btnCadastrar = new JButton("Cadastrar");           
         btnCadastrar.setBounds(314, 335, 110, 23);
@@ -53,8 +53,13 @@ public class TelaCadastroUsuarios extends JPanel {
         return textFieldUsuario.getText().trim();
     }
 
-    public String getSenha() {
-        return textFieldSenha.getText().trim();            
+     public String getCpfMasked() {
+    	    return textFieldCPF.getText().trim();      
+    }
+     
+    public String getCpfDigits() {
+    	   Object v = textFieldCPF.getValue();          
+    	   return v == null ? "" : v.toString();        //  só os 11 dígitos
     }
 
     public boolean isAdminSelecionado() {
@@ -67,7 +72,7 @@ public class TelaCadastroUsuarios extends JPanel {
 
     public void limparCampos() {
         textFieldUsuario.setText("");
-        textFieldSenha.setText("");
+        textFieldCPF.setText("");
         chckbxAdm.setSelected(false);
     }
 }

@@ -7,8 +7,8 @@ import java.util.List;
 
 public class ProdutoDAO {
 
-    private static final String URL =
-		    "jdbc:mysql://localhost:3306/loja?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";
+		private static final String URL =
+		    "jdbc:mysql://localhost:3306/loja?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=America/Sao_Paulo";
 		private static final String USER = "root";      
 		private static final String PASS = "NovaSenha!2025";  
 
@@ -90,11 +90,11 @@ public class ProdutoDAO {
     }
 
     private Produto map(ResultSet rs) throws SQLException {
-        int id       = rs.getInt("id");
-        String nome  = rs.getString("nome");
-        String desc  = rs.getString("descricao");
-        float preco  = rs.getBigDecimal("preco").floatValue();
-        int qtd      = rs.getInt("quantidade");
+        int id = rs.getInt("id");
+        String nome = rs.getString("nome");
+        String desc = rs.getString("descricao");
+        float preco = rs.getBigDecimal("preco").floatValue();
+        int qtd = rs.getInt("quantidade");
         return new Produto(nome, desc, id, qtd, preco);
     }
 

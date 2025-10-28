@@ -26,6 +26,8 @@ public class CadastroProdutosController {
         view.onAtualizar(e -> editarOuSalvar());
         view.onExcluir(e -> excluir());
         view.onListar(e -> exibirSelecionado());
+        view.sair(e -> navegador.navegarPara("LOGIN"));
+
     }
 
     private void cadastrar() {
@@ -107,7 +109,15 @@ public class CadastroProdutosController {
             erro("Erro ao excluir: " + ex.getMessage(), ex);
         }
     }
-
+    
+    public void atualizarListaExterna() {
+        try {
+            java.lang.reflect.Method m = this.getClass().getDeclaredMethod("listar");
+            m.setAccessible(true);
+            m.invoke(this);
+        } catch (Exception ignore) { }
+    }
+    
     private void listar() {
         try {
             List<Produto> lista = produtoDAO.exibirProduto();

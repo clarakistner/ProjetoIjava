@@ -9,6 +9,7 @@ import view.TelaCompras;
 import javax.swing.*;
 import java.math.BigDecimal;
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -16,7 +17,7 @@ import java.util.Locale;
 public class CarrinhoController {
     private final TelaCompras view;
     private String usuarioLogado;
-    private final ProdutoDAO  produtoDAO  = new ProdutoDAO();
+    private final ProdutoDAO  produtoDAO = new ProdutoDAO();
     private final CarrinhoDAO carrinhoDAO = new CarrinhoDAO();
 
     private final NumberFormat moeda = NumberFormat.getCurrencyInstance(new Locale("pt","BR"));
@@ -36,7 +37,7 @@ public class CarrinhoController {
     public void recarregar() {
         carregarProdutos();
         if (isUsuarioValido()) {
-            atualizarCarrinhoETotal();
+            atualizarCarrinhoETotal(); 
         } else {
             view.setCarrinho(Collections.emptyList());
             view.setTotalTexto(moeda.format(BigDecimal.ZERO));
@@ -44,17 +45,45 @@ public class CarrinhoController {
     }
 
     private void wire() {
-        view.adicionar(e   -> adicionar1());
-        view.remover(e     -> remover1());
+        view.adicionar(e -> adicionar1());
+        view.remover(e -> remover1());
         view.removerTudo(e -> removerTudo());
-        view.exibir(e      -> exibirSelecionado());
-        
+        view.exibir(e -> exibirSelecionado());
+    }
+
+    private int quantidadeEmCarrinho(Integer idProduto) {
+        if (!isUsuarioValido() || idProduto == null) return 0;
+        try {
+            List<Carrinho> itens = carrinhoDAO.exibirProduto(usuarioLogado);
+            int soma = 0;
+            for (Carrinho c : itens) {
+                if (idProduto.equals(c.getIdProduto())) soma += c.getQuantidade();
+            }
+            return soma;
+        } catch (Exception ignore) {
+            return 0;
+        }
     }
 
     private void carregarProdutos() {
         try {
             List<Produto> produtos = produtoDAO.exibirProduto();
-            view.setProdutos(produtos);
+            List<Produto> ajustados = new ArrayList<>(produtos.size());
+
+            for (Produto p : produtos) {
+                int reservado = isUsuarioValido() ? quantidadeEmCarrinho(p.getId()) : 0;
+                int disponivel = Math.max(0, p.getQtd() - reservado);
+               
+                Produto visivel = new Produto(
+                        p.getNome(),
+                        p.getDescricao(),
+                        p.getId(),
+                        disponivel,           
+                        p.getPreco()
+                );
+                ajustados.add(visivel);
+            }
+            view.setProdutos(ajustados);
         } catch (Exception ex) {
             erro("Erro ao carregar produtos: " + ex.getMessage());
         }
@@ -77,8 +106,21 @@ public class CarrinhoController {
         try {
             Integer id = view.getProdutoSelecionadoId();
             if (id == null) { warn("Selecione um produto na lista da esquerda."); return; }
+
+            Produto p = produtoDAO.exibirProduto(id);
+            if (p == null) { warn("Produto não encontrado."); return; }
+
+            int reservado = quantidadeEmCarrinho(id);
+            int disponivel = p.getQtd() - reservado;
+
+            if (disponivel <= 0) {
+                warn("Estoque insuficiente para \"" + p.getNome() + "\".");
+                return;
+            }
+
             boolean ok = carrinhoDAO.adicionarProduto(usuarioLogado, id, 1);
-            if (!ok) warn("Estoque insuficiente ou produto inexistente.");
+            if (!ok) warn("Estoque insuficiente ou produto indisponível.");
+
             recarregar(); 
         } catch (Exception ex) {
             erro("Erro ao adicionar: " + ex.getMessage());
@@ -92,7 +134,7 @@ public class CarrinhoController {
             if (id == null) { warn("Selecione um item no carrinho."); return; }
             boolean ok = carrinhoDAO.removerProduto(usuarioLogado, id, 1);
             if (!ok) warn("Produto não estava no carrinho.");
-            recarregar(); // ✅
+            recarregar(); 
         } catch (Exception ex) {
             erro("Erro ao remover: " + ex.getMessage());
         }
@@ -103,8 +145,8 @@ public class CarrinhoController {
         try {
             int r = JOptionPane.showConfirmDialog(view, "Remover todos os itens do carrinho?", "Confirmar", JOptionPane.YES_NO_OPTION);
             if (r != JOptionPane.YES_OPTION) return;
-            carrinhoDAO.removerTodosProdutos(usuarioLogado); 
-            recarregar(); 
+            carrinhoDAO.removerTodosProdutos(usuarioLogado);
+            recarregar();
         } catch (Exception ex) {
             erro("Erro ao limpar: " + ex.getMessage());
         }

@@ -22,7 +22,7 @@ public class Main {
         SwingUtilities.invokeLater(() -> {
 
             Janela janela = new Janela();
-            janela.setTitle("Kronos - Loja");
+            janela.setTitle("Mercado");
             janela.setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
             Navegador navegador = new Navegador(janela);
@@ -30,13 +30,19 @@ public class Main {
             UsuarioDAO usuarioDAO = new UsuarioDAO();
             ProdutoDAO produtoDAO = new ProdutoDAO();
 
-            TelaLogin            telaLogin            = new TelaLogin();
+            TelaLogin telaLogin = new TelaLogin();
             TelaCadastroUsuarios telaCadastroUsuarios = new TelaCadastroUsuarios();
             TelaCadastroProdutos telaCadastroProdutos = new TelaCadastroProdutos();
-            TelaCompras          telaCompras          = new TelaCompras();
+            TelaCompras telaCompras = new TelaCompras();
 
-            CarrinhoController carrinhoController = new CarrinhoController(telaCompras, null);
-            CompraController   compraController   = new CompraController(telaCompras,   null);
+            CadastroProdutosController cadastroProdutosController =
+                new CadastroProdutosController(telaCadastroProdutos, produtoDAO, navegador);
+
+            CarrinhoController carrinhoController =
+                new CarrinhoController(telaCompras, null);
+
+            CompraController compraController =
+                new CompraController(telaCompras, null, navegador, cadastroProdutosController);
 
             new CadastroController(
                 telaLogin,
@@ -47,16 +53,10 @@ public class Main {
                 compraController
             );
 
-            new CadastroProdutosController(
-                telaCadastroProdutos,
-                produtoDAO,
-                navegador
-            );
-
-            navegador.adicionarPainel("LOGIN",             telaLogin);
+            navegador.adicionarPainel("LOGIN", telaLogin);
             navegador.adicionarPainel("CADASTRO_USUARIOS", telaCadastroUsuarios);
             navegador.adicionarPainel("CADASTRO_PRODUTOS", telaCadastroProdutos);
-            navegador.adicionarPainel("COMPRAS",           telaCompras);
+            navegador.adicionarPainel("COMPRAS", telaCompras);
 
             janela.pack();
             janela.setLocationRelativeTo(null);

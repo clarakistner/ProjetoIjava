@@ -15,16 +15,17 @@ import java.awt.event.ActionEvent;
 public class TelaCompras extends JPanel {
     private static final long serialVersionUID = 1L;
 
-    private final DefaultListModel<Produto> modeloProdutos  = new DefaultListModel<>();
+    private final DefaultListModel<Produto> modeloProdutos = new DefaultListModel<>();
     private final DefaultListModel<Carrinho> modeloCarrinho = new DefaultListModel<>();
-    private final JList<Produto> lstProdutos   = new JList<>(modeloProdutos);
-    private final JList<Carrinho> lstCarrinho  = new JList<>(modeloCarrinho);
+    private final JList<Produto> lstProdutos = new JList<>(modeloProdutos);
+    private final JList<Carrinho> lstCarrinho = new JList<>(modeloCarrinho);
 
-    private final JButton btnAdd         = new JButton("Adicionar >");
-    private final JButton btnRemover     = new JButton("< Remover");
+    private final JButton btnAdd = new JButton("Adicionar >");
+    private final JButton btnRemover = new JButton("< Remover");
     private final JButton btnRemoverTudo = new JButton("< Tudo");
-    private final JButton btnExibir      = new JButton("Exibir");
-    private final JButton btnFinalizar   = new JButton("Finalizar Compra");
+    private final JButton btnExibir = new JButton("Exibir");
+    private final JButton btnFinalizar = new JButton("Finalizar Compra");
+    private final JButton btnSair = new JButton("Sair"); 
 
     private final JLabel lblTotalValor = new JLabel("R$ 0,00");
 
@@ -32,7 +33,6 @@ public class TelaCompras extends JPanel {
         setBackground(new Color(255, 182, 193));
         setLayout(null);
         setPreferredSize(new Dimension(700, 500));
-
 
         JLabel titulo = new JLabel("Compras", SwingConstants.CENTER);
         titulo.setFont(new Font("Baskerville Old Face", Font.BOLD | Font.ITALIC, 30));
@@ -104,6 +104,9 @@ public class TelaCompras extends JPanel {
 
         btnFinalizar.setBounds(548, 401, 130, 26);
         add(btnFinalizar);
+
+        btnSair.setBounds(583, 444, 89, 23);
+        add(btnSair);
     }
 
     public void setProdutos(List<Produto> produtos) {
@@ -129,11 +132,29 @@ public class TelaCompras extends JPanel {
 
     public void setTotalTexto(String txt) { lblTotalValor.setText(txt == null ? "R$ 0,00" : txt); }
 
-    public void adicionar(java.awt.event.ActionListener l)    { btnAdd.addActionListener(l); }
-    public void remover(java.awt.event.ActionListener l)      { btnRemover.addActionListener(l); }
-    public void removerTudo(java.awt.event.ActionListener l)  { btnRemoverTudo.addActionListener(l); }
-    public void exibir(java.awt.event.ActionListener l)       { btnExibir.addActionListener(l); }
-    public void finalizar(java.awt.event.ActionListener l)    { btnFinalizar.addActionListener(l); }
+    public void adicionar(java.awt.event.ActionListener l) { 
+    	btnAdd.addActionListener(l); 
+    }
+    
+    public void remover(java.awt.event.ActionListener l) {
+    	btnRemover.addActionListener(l); 
+    }
+    
+    public void removerTudo(java.awt.event.ActionListener l) {
+    	btnRemoverTudo.addActionListener(l); 
+    }
+    
+    public void exibir(java.awt.event.ActionListener l) { 
+    	btnExibir.addActionListener(l); 
+    }
+    
+    public void finalizar(java.awt.event.ActionListener l) { 
+    	btnFinalizar.addActionListener(l); 
+    }
+ 
+    public void sair(java.awt.event.ActionListener l) { 
+    	btnSair.addActionListener(l); 
+    }
 
 	public void limparCarrinhoUI() {
 		// TODO Auto-generated method stub
